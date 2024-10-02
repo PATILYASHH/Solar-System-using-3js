@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bright Sun with Solar Flares & Info - Three.js</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            display: block;
+        }
+        /* Info button */
+        #info-icon {
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            background-color: rgba(255, 188, 2, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 28px;
+            z-index: 10;
+        }
+        /* Info panel */
+        #info-panel {
+            position: absolute;
+            top: 70px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 250px;
+            display: none;
+            z-index: 10;
+        }
+        #info-panel h2 {
+            margin-top: 0;
+            font-size: 24px;
+        }
+        #info-panel p {
+            font-size: 16px;
+        }
+        #close-info {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Info Icon -->
+    <div id="info-icon">info</div>
+    <!-- Info Panel -->
+    <div id="info-panel">
+        <span id="close-info">&times;</span>
+        <p class="info-item"><strong>Radius:</strong> 1,737.4 km</p>
+    <p class="info-item"><strong>Surface Temperature:</strong> -173°C to 127°C</p>
+    <p class="info-item"><strong>Core Temperature:</strong> Approximately 1,500°C</p>
+    <p class="info-item"><strong>Age:</strong> 4.5 billion years</p>
+    <p class="info-item"><strong>Type:</strong> Natural Satellite of Earth</p>
+    <p class="info-item"><strong>Orbit Distance from Earth:</strong> 384,400 km</p>
+    <p class="info-item"><strong>Orbital Period:</strong> 27.3 days</p>
+    <p class="info-item"><strong>Gravity:</strong> 1.62 m/s² (about 1/6th of Earth's)</p>
+    <p class="info-item"><strong>Phases:</strong> New Moon, First Quarter, Full Moon, Last Quarter</p>
+    <p class="info-item"><strong>Notable Features:</strong> Mare (seas), Highlands, and Craters</p>
+
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Texture loader
+        const textureLoader = new THREE.TextureLoader();
+
+        // Sun
+        const sunTexture = textureLoader.load('https://upload.wikimedia.org/wikipedia/commons/e/e2/Sun_texture_map.jpg');
+        const sunMaterial = new THREE.MeshBasicMaterial({ map: sunTexture });
+        const sunGeometry = new THREE.SphereGeometry(2, 64, 64);
+        const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+        scene.add(sun);
+
+        // Light source for the Sun
+        const pointLight = new THREE.PointLight(0xffffff, 1.5, 100);
+        pointLight.position.set(0, 0, 0);
+        scene.add(pointLight);
+
+        // Glow effect around Sun
+        const glowMaterial = new THREE.MeshBasicMaterial({
+            color: 0xffd700,
+            transparent: true,
+            opacity: 0.5,
+        });
+        const glowGeometry = new THREE.SphereGeometry(2.5, 64, 64);
+        const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+        scene.add(glow);
+
+        // Solar Flares
+        const flareMaterial = new THREE.PointsMaterial({
+            color: 0xff4500,
+            size: 0.1,
+            transparent: true,
+            opacity: 0.7,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+        });
+
+        const flareGeometry = new THREE.BufferGeometry();
+        const flareCount = 1500;
+        const flarePositions = new Float32Array(flareCount * 3);
+        const flareVelocities = new Float32Array(flareCount * 3);
+
+        for (let i = 0; i < flareCount * 3; i++) {
+            const radius = Math.random() * 2.5 + 2;
+            const angle1 = Math.random() * Math.PI * 2;
+            const angle2 = Math.random() * Math.PI;
+
+            const x = radius * Math.sin(angle2) * Math.cos(angle1);
+            const y = radius * Math.sin(angle2) * Math.sin(angle1);
+            const z = radius * Math.cos(angle2);
+
+            flarePositions[i] = x;
+            flarePositions[++i] = y;
+            flarePositions[++i] = z;
+
+            flareVelocities[i - 2] = (Math.random() - 0.5) * 0.05;
+            flareVelocities[i - 1] = (Math.random() - 0.5) * 0.05;
+            flareVelocities[i] = (Math.random() - 0.5) * 0.05;
+        }
+
+        flareGeometry.setAttribute('position', new THREE.BufferAttribute(flarePositions, 3));
+        const solarFlares = new THREE.Points(flareGeometry, flareMaterial);
+        scene.add(solarFlares);
+
+        // Earth
+        const earthTexture = textureLoader.load('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThTNIBn1nRMwvXQyk7lB3jKHXOp3lYwaZ6Gg&s');
+        const earthMaterial = new THREE.MeshBasicMaterial({ map: earthTexture });
+        const earthGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+        const earth = new THREE.Mesh(earthGeometry, earthMaterial);
+        scene.add(earth);
+
+        // Moon
+        const moonTexture = textureLoader.load('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScdkdTMJTPJqYTi2I6_6BliOR9YzgARPbWeg&s');
+        const moonMaterial = new THREE.MeshBasicMaterial({ map: moonTexture });
+        const moonGeometry = new THREE.SphereGeometry(0.1, 16, 16);
+        const moon = new THREE.Mesh(moonGeometry, moonMaterial);
+        earth.add(moon); // Add moon to earth
+
+        // Camera setup
+        camera.position.z = 8;
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Rotate Sun
+            sun.rotation.y += 0.001;
+
+            // Rotate Earth and Orbit Moon
+            earth.rotation.y += 0.005; // Earth rotation
+            earth.position.x = 4 * Math.cos(Date.now() * 0.001); // Earth orbiting the Sun
+            earth.position.z = 4 * Math.sin(Date.now() * 0.001);
+            
+            // Update Moon's position
+            moon.position.x = 0.75 * Math.cos(Date.now() * 0.01); // Moon orbits around Earth
+            moon.position.z = 0.75 * Math.sin(Date.now() * 0.01);
+
+            // Solar Flares animation
+            const positions = solarFlares.geometry.attributes.position.array;
+            for (let i = 0; i < flareCount * 3; i += 3) {
+                positions[i] += flareVelocities[i];
+                positions[i + 1] += flareVelocities[i + 1];
+                positions[i + 2] += flareVelocities[i + 2];
+
+                const distance = Math.sqrt(positions[i] ** 2 + positions[i + 1] ** 2 + positions[i + 2] ** 2);
+                if (distance > 4) {
+                    positions[i] = (Math.random() - 0.5) * 3;
+                    positions[i + 1] = (Math.random() - 0.5) * 3;
+                    positions[i + 2] = (Math.random() - 0.5) * 3;
+                }
+            }
+
+            solarFlares.geometry.attributes.position.needsUpdate = true;
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Window resize
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+
+        // Info Icon and Panel
+        const infoIcon = document.getElementById('info-icon');
+        const infoPanel = document.getElementById('info-panel');
+        const closeInfo = document.getElementById('close-info');
+
+        infoIcon.addEventListener('click', () => {
+            infoPanel.style.display = 'block';
+        });
+
+        closeInfo.addEventListener('click', () => {
+            infoPanel.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
