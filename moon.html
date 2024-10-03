@@ -18,7 +18,7 @@
             position: absolute;
             top: 50px;
             left: 50px;
-            background-color: rgba(255, 188, 2, 0.7);
+            background-color: rgb(219, 113, 64);
             color: white;
             padding: 10px;
             border-radius: 50%;
@@ -54,6 +54,10 @@
             font-size: 18px;
             color: white;
         }
+        .semoon{
+            background-color: rgba(207, 211, 200, 0.774)74);
+            font-family:arial black;
+        }
     </style>
 </head>
 <body>
@@ -72,7 +76,9 @@
     <p class="info-item"><strong>Gravity:</strong> 1.62 m/s² (about 1/6th of Earth's)</p>
     <p class="info-item"><strong>Phases:</strong> New Moon, First Quarter, Full Moon, Last Quarter</p>
     <p class="info-item"><strong>Notable Features:</strong> Mare (seas), Highlands, and Craters</p>
-
+<a href="sepretmoon.html">
+    <button class="semoon">See only Moon</button>
+</a>
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -173,13 +179,13 @@
             sun.rotation.y += 0.001;
 
             // Rotate Earth and Orbit Moon
-            earth.rotation.y += 0.005; // Earth rotation
-            earth.position.x = 4 * Math.cos(Date.now() * 0.001); // Earth orbiting the Sun
-            earth.position.z = 4 * Math.sin(Date.now() * 0.001);
+            earth.rotation.y += 0.0010; // Earth rotation
+            earth.position.x = 10 * Math.cos(Date.now() * 0.001); // Earth orbiting the Sun
+            earth.position.z = 10 * Math.sin(Date.now() * 0.001);
             
             // Update Moon's position
-            moon.position.x = 0.75 * Math.cos(Date.now() * 0.01); // Moon orbits around Earth
-            moon.position.z = 0.75 * Math.sin(Date.now() * 0.01);
+            moon.position.x = 0.80 * Math.cos(Date.now() * 0.01); // Moon orbits around Earth
+            moon.position.z = 0.50 * Math.sin(Date.now() * 0.01);
 
             // Solar Flares animation
             const positions = solarFlares.geometry.attributes.position.array;

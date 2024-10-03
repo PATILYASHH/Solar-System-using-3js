@@ -130,3 +130,44 @@ h1 {
         grid-template-columns: 1fr;
     }
 }
+
+.cursor {
+    position: absolute;
+    width: 50px; /* Default size of the rocket */
+    height: 50px;
+    pointer-events: none; /* Prevent interference with mouse events */
+    transition: transform 0.2s ease; /* Smooth delay for following */
+}
+
+.fire {
+    animation: fire 0.5s infinite alternate; /* Fire effect under the rocket */
+}
+
+@keyframes fire {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-5px); }
+}
+
+/* Flare effect styling */
+.flare {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255, 200, 50, 0.5); /* Flare color */
+    filter: blur(15px); /* Flare blur effect */
+    opacity: 0; /* Initially hidden */
+    pointer-events: none;
+    transition: opacity 0.1s ease-out; /* Transition for smooth fade-in/out */
+}
+
+@keyframes flareMove {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(2); /* Flare expands while fading out */
+    }
+}
